@@ -62,7 +62,9 @@ concommand.Add( "gmedal_edit", function()
             comboBox:AddChoice( t:Name() )
         end
 
-        DButton.DoClick = function()
+         DButton.DoClick = function()
+            surface.PlaySound(gMedals.ButtonSound)
+            
             if not target then
                 print("[gMedal Error!] No target selected!")
             end
