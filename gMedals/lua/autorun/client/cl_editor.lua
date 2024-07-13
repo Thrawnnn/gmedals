@@ -26,7 +26,7 @@ concommand.Add( "gmedal_edit", function()
     
     for k,v in pairs(gMedals.Config) do
         local DButton = DScrollPanel:Add( "DImageButton" )
-        DButton:SetSize(25,90)
+        DButton:SetSize(25,150)
         DButton:SetImage( gMedals.Config[k].editorMat or gMedals.FallBackImage ) -- make the image button the material for the award OR fallback to a default image.
         --DButton:SetText( gMedals.Config[k].name )
         DButton:Dock( TOP )
@@ -72,10 +72,19 @@ concommand.Add( "gmedal_edit", function()
             for _,n in player.Iterator() do
                 if n:Name() == target then
                     if type == "Give Medal" then
+                        net.Start("UpdateMedals")
+                            net.WriteInt(gMedals.Config[k].id, 8)
+                            net.WritePlayer(n)
+                        net.SendToServer()
                         n:GiveMedal(gMedals.Config[k].id)
                         print("[gMedal Logger] Giving "..n:Name().." (ENT ID: "..tostring(n).." ) "..gMedals.Config[k].name) 
                     elseif type == "Take Medal" then 
                         n:RemoveMedal(gMedals.Config[k].id)
+                        net.Start("UpdateMedalsRemove")
+                            net.WriteInt(gMedals.Config[k].id, 8)
+                            net.WritePlayer(n)
+                        net.SendToServer()
+
                         print("[gMedal Logger] Removing "..gMedals.Config[k].name.." from "..n:Name().." (ENT ID: "..tostring(n).." ) ") 
                     end
                     break -- stop the loop when the targets found, just best practice for performance ratings :)
