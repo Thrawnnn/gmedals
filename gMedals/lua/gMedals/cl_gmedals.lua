@@ -8,7 +8,7 @@ local function gMedal_Draw(target, alpha)
 
 	local lp = LocalPlayer()
 
-	local ang = (pos - lp:EyePos()):GetNormalized():Angle()
+	local ang = (pos - lp:EyePos()):GetNormalized():Angle() -- keep the angles correct
 
 	ang:RotateAroundAxis(ang:Up(), -106)
 	ang:RotateAroundAxis(ang:Forward(), 90)
@@ -20,7 +20,7 @@ local function gMedal_Draw(target, alpha)
 
 	cam.Start3D2D(pos, ang, 0.1)
 		cam.IgnoreZ(true)
-        		draw.DrawText("Test", "Arial", 3, 3, 0)
+        		draw.DrawText("Test", "Arial", 3, 3, 0) -- just a test thing
 		cam.IgnoreZ(false)
 	cam.End3D2D()
 end
