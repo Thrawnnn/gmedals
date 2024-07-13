@@ -82,7 +82,6 @@ concommand.Add( "gmedal_edit", function()
                 end
             end
             -- OMG NO SHOT I DID ALL THIS IN ONE TRY WITHOUT ERRORS I AM SO SMART BRO
-            target = nil -- resets the target player
         end
     end
 
