@@ -1,5 +1,5 @@
 -- Myam!
-p = FindMetaTable("Player")
+local p = FindMetaTable("Player")
 
 gMedals = gMedals or {}
 gMedals.Config = gMedals.Config or {}
@@ -9,6 +9,7 @@ CADET_INSIGNIA = 1
 SERGEANT_INSIGNIA = 2
 OFFICER_INSIGNIA = 3
 MEDAL_HONOR = 4
+IRON_CROSS = 5
 
 -- PLEASE PLEASE PLEASE REMEMBER TO CONFIGURE YOUR MEDALS LIKE THIS!
 -- E.G If you make a medal named MEDAL_HONOR then don't forget to equivocate it to a number like MEDAL_HONOR = 4 or something!
@@ -48,7 +49,7 @@ gMedals.Config = {
         name = "Medal Of Honor",
         desc = "The medal of Honor",
         id = 4,
-        priority = 3,
+        priority = 4,
         material = Material("allied-star.png"),
         editorMat = "allied-star.png"
     },
@@ -77,25 +78,42 @@ Example:
 if SERVER then -- no real reason to really have this *probably*
     util.AddNetworkString("UpdateMedals")
     util.AddNetworkString("RemoveMedals")
+    util.AddNetworkString("SendMedals")
+    util.AddNetworkString("SendMedalsRemove")
+    util.AddNetworkString("UpdateMedalsRemove")
 
-    function p:GiveMedal(medalEnum)
-        self:SetPData(medalEnum, true)
-        net.Start("UpdateMedals")
-        net.WritePlayer(self)
-        net.WriteInt(medalEnum, 8)
+    net.Receive("UpdateMedals", function()
+        local medal = net.ReadInt(8)
+        local ply = net.ReadPlayer()
+        ply:GiveMedal(medal)
+        net.Start("SendMedals")
+            net.WriteInt(medal, 8)
+            net.WritePlayer(ply)
         net.Broadcast()
-        print("[gMedal Server Logger] Giving medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") to player "..self:Nick())
-    end
-    
-    function p:RemoveMedal(medalEnum)
-        self:RemovePData(medalEnum)
-        net.Start("RemoveMedals")
-        net.WritePlayer(self)
-        net.WriteInt(medalEnum, 8)
+
+        print("Broadcast sent")
+    end)
+
+    net.Receive("UpdateMedalsRemove", function()
+        local medal = net.ReadInt(8)
+        local ply = net.ReadPlayer()
+        ply:GiveMedal(medal)
+        net.Start("SendMedalsRemove")
+            net.WriteInt(medal, 8)
+            net.WritePlayer(ply)
         net.Broadcast()
-        print("[gMedal Server Logger] Removing medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") from player "..self:Nick())
-    end    
+    end)
 end
+
+function p:GiveMedal(medalEnum)
+    self:SetPData(medalEnum, true)
+    print("[gMedals Logger] Giving medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") to player "..self:Nick())
+end
+
+function p:RemoveMedal(medalEnum)
+    self:RemovePData(medalEnum)
+    print("[gMedals Logger] Removing medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") from player "..self:Nick())
+end    
 
 function p:HasMedal(medalEnum)
     if not IsValid(self) then return false end
