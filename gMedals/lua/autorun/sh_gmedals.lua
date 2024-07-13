@@ -14,6 +14,7 @@ MEDAL_HONOR = 4
 -- E.G If you make a medal named MEDAL_HONOR then don't forget to equivocate it to a number like MEDAL_HONOR = 4 or something!
 
 gMedals.FallBackImage = "achievement.png"
+gMedals.ButtonSound = "buttons/lightswitch2.wav" -- the sound that should play when pressing a button in the editor
 
 gMedals.Config = {
     [CADET_INSIGNIA] = {
