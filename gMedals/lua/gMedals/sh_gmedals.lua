@@ -1,5 +1,6 @@
 -- Myam!
 p = FindMetaTable("Player")
+
 gMedals = gMedals or {}
 gMedals.Config = gMedals.Config or {}
 
