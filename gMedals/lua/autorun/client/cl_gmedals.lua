@@ -4,26 +4,29 @@ surface.CreateFont( "medalFont", {
 } )
 
 net.Receive("UpdateMedals", function()
-    ply = net.ReadPlayer()
-    medal = net.ReadInt(8)
+    local ply = net.ReadPlayer()
+    local medal = net.ReadInt(8)
     ply:GiveMedal(medal)
 end)
 
 net.Receive("RemoveMedals", function()
-    ply = net.ReadPlayer()
-    medal = net.ReadInt(8)
+    local ply = net.ReadPlayer()
+    local medal = net.ReadInt(8)
     ply:RemoveMedal(medal)
 end)
 
-function p:GiveMedal(medalEnum)
-    self:SetPData(medalEnum, true)
-    print("[gMedal Client Logger] Giving medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") to player "..self:Nick())
-end
+net.Receive("SendMedals", function()
+    local ply = net.ReadPlayer()
+    local medal = net.ReadInt(8)
+    ply:GiveMedal(medal)
+    print("Broadcast received")
+end)
 
-function p:RemoveMedal(medalEnum)
-    self:RemovePData(medalEnum)
-    print("[gMedal Client Logger] Removing medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") from player "..self:Nick())
-end    
+net.Receive("SendMedalsRemove", function()
+    local ply = net.ReadPlayer()
+    local medal = net.ReadInt(8)
+    ply:RemoveMedal(medal)
+end)
 
 hook.Add("PostPlayerDraw", "gMedal_DrawMedal", function(ply)
     if (ply:GetPos():Distance(EyePos()) > 512) then return end
