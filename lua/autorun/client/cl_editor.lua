@@ -77,6 +77,7 @@ concommand.Add( "gmedal_edit", function()
                             net.WritePlayer(n)
                         net.SendToServer()
                         n:GiveMedal(gMedals.Config[k].id)
+                        notification.AddLegacy("You have given "..n:Name().." the "..gMedals.Config[k].name.." medal.", 0, 5)
                         print("[gMedal Logger] Giving "..n:Name().." (ENT ID: "..tostring(n).." ) "..gMedals.Config[k].name) 
                     elseif type == "Take Medal" then 
                         n:RemoveMedal(gMedals.Config[k].id)
@@ -84,7 +85,7 @@ concommand.Add( "gmedal_edit", function()
                             net.WriteInt(gMedals.Config[k].id, 8)
                             net.WritePlayer(n)
                         net.SendToServer()
-
+                        notification.AddLegacy("You have removed ".." the "..gMedals.Config[k].name.." medal from "..n:Name(), 1, 5)
                         print("[gMedal Logger] Removing "..gMedals.Config[k].name.." from "..n:Name().." (ENT ID: "..tostring(n).." ) ") 
                     end
                     break -- stop the loop when the targets found, just best practice for performance ratings :)
