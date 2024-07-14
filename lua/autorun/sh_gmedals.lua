@@ -76,47 +76,56 @@ Example:
 
 
 if SERVER then -- no real reason to really have this *probably*
-    util.AddNetworkString("UpdateMedals")
-    util.AddNetworkString("RemoveMedals")
-    util.AddNetworkString("SendMedals")
-    util.AddNetworkString("SendMedalsRemove")
-    util.AddNetworkString("UpdateMedalsRemove")
+    util.AddNetworkString("SYNC_MEDALS_ADD")
+    util.AddNetworkString("SYNC_MEDALS_REMOVE")
+    util.AddNetworkString("SYNC_MEDALS_SPAWN")
 
-    net.Receive("UpdateMedals", function()
+    net.Receive("SYNC_MEDALS_ADD", function()
         local medal = net.ReadInt(8)
         local ply = net.ReadPlayer()
-        ply:GiveMedal(medal)
-        net.Start("SendMedals")
-            net.WriteInt(medal, 8)
-            net.WritePlayer(ply)
-        net.Broadcast()
 
-        print("Broadcast sent")
+        ply:SetPData(medal, true)
     end)
 
-    net.Receive("UpdateMedalsRemove", function()
+    net.Receive("SYNC_MEDALS_REMOVE", function()
         local medal = net.ReadInt(8)
         local ply = net.ReadPlayer()
-        ply:GiveMedal(medal)
-        net.Start("SendMedalsRemove")
-            net.WriteInt(medal, 8)
-            net.WritePlayer(ply)
-        net.Broadcast()
+
+        ply:RemovePData(medal)
+    end)
+
+    hook.Add("PlayerInitialSpawn", "SYNC_MEDALS_ONSPAWN", function(ply)
+        for enum,v in pairs(gMedals.Config) do
+            if ply:GetPData(enumk, false) then
+                ply:SetNWBool(enum, true)
+            end
+        end
     end)
 end
 
 function p:GiveMedal(medalEnum)
-    self:SetPData(medalEnum, true)
+    net.Start("SYNC_MEDALS_ADD")
+        net.WriteInt(medalEnum, 8)
+        net.WritePlayer(self)
+    net.SendToServer()
+
+
+    self:SetNWBool(medalEnum, true)
     print("[gMedals Logger] Giving medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") to player "..self:Nick())
 end
 
 function p:RemoveMedal(medalEnum)
-    self:RemovePData(medalEnum)
+   net.Start("SYNC_MEDALS_REMOVE")
+        net.WriteInt(medalEnum, 8)
+        net.WritePlayer(self)
+    net.SendToServer()
+
+    self:SetNWBool(medalEnum, false)
     print("[gMedals Logger] Removing medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") from player "..self:Nick())
 end    
 
 function p:HasMedal(medalEnum)
     if not IsValid(self) then return false end
-    result = self:GetPData(medalEnum, false)
+    result = self:GetNWBool(medalEnum, false)
     return result
 end
