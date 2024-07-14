@@ -72,13 +72,25 @@ concommand.Add( "gmedal_edit", function()
             for _,n in player.Iterator() do
                 if n:Name() == target then
                     if type == "Give Medal" then
-                        -- network it!
+
                         n:GiveMedal(gMedals.Config[k].id)
+
+                        net.Start("SYNC_MEDALS_ADD")
+                            net.WriteInt(gMedals.Config[k].id, 8)
+                            net.WritePlayer(n)
+                        net.SendToServer()
+
                         notification.AddLegacy("You have given "..n:Name().." the "..gMedals.Config[k].name.." medal.", 0, 5)
                         print("[gMedal Logger] Giving "..n:Name().." (ENT ID: "..tostring(n).." ) "..gMedals.Config[k].name) 
                     elseif type == "Take Medal" then 
+                        
                         n:RemoveMedal(gMedals.Config[k].id)
-                        -- network it!
+
+                        net.Start("SYNC_MEDALS_REMOVE")
+                            net.WriteInt(gMedals.Config[k].id, 8)
+                            net.WritePlayer(n)
+                        net.SendToServer()
+
                         notification.AddLegacy("You have removed ".." the "..gMedals.Config[k].name.." medal from "..n:Name(), 1, 5)
                         print("[gMedal Logger] Removing "..gMedals.Config[k].name.." from "..n:Name().." (ENT ID: "..tostring(n).." ) ") 
                     end
