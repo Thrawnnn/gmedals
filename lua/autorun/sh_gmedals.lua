@@ -85,44 +85,42 @@ if SERVER then -- no real reason to really have this *probably*
         local ply = net.ReadPlayer()
 
         ply:SetPData(medal, true)
+        ply:SetNWBool(medal, true)
     end)
 
     net.Receive("SYNC_MEDALS_REMOVE", function()
         local medal = net.ReadInt(8)
         local ply = net.ReadPlayer()
-
+    
         ply:RemovePData(medal)
+        ply:SetNWBool(medal, false)
+        print("Removed medal PData for", medal, "from player", ply:Nick(), "PData now:", ply:GetPData(medal))
     end)
-
-    hook.Add("PlayerInitialSpawn", "SYNC_MEDALS_ONSPAWN", function(ply)
-        for enum,v in pairs(gMedals.Config) do
+    
+   hook.Add("PlayerInitialSpawn", "SYNC_MEDALS_ONSPAWN", function(ply)
+        print("PlayerInitialSpawn for", ply:Nick())
+        for enum, v in pairs(gMedals.Config) do
             if ply:GetPData(enum, false) then
-                ply:SetNWBool(enum, true)
+                ply:GiveMedal(enum)
+                ply:SetPData(enum, true)
+                print("Re-adding medal", enum, "to player", ply:Nick())
+            else
+                print("Not adding medal", enum, "to player", ply:Nick())
             end
         end
     end)
+    
 end
 
 function p:GiveMedal(medalEnum)
-    net.Start("SYNC_MEDALS_ADD")
-        net.WriteInt(medalEnum, 8)
-        net.WritePlayer(self)
-    net.SendToServer()
-
-
     self:SetNWBool(medalEnum, true)
     print("[gMedals Logger] Giving medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") to player "..self:Nick())
 end
 
 function p:RemoveMedal(medalEnum)
-   net.Start("SYNC_MEDALS_REMOVE")
-        net.WriteInt(medalEnum, 8)
-        net.WritePlayer(self)
-    net.SendToServer()
-
     self:SetNWBool(medalEnum, false)
     print("[gMedals Logger] Removing medal "..gMedals.Config[medalEnum].name.." (ID# "..gMedals.Config[medalEnum].id..") from player "..self:Nick())
-end    
+end
 
 function p:HasMedal(medalEnum)
     if not IsValid(self) then return false end
