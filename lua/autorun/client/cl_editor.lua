@@ -12,7 +12,7 @@ concommand.Add( "gmedal_edit", function()
 	DermaPanel:SetSize(ScrW() / 4, ScrH() / 3)
 	DermaPanel:Center() 
 	DermaPanel:SetTitle("") 
-	DermaPanel:SetDraggable(false)
+	DermaPanel:SetDraggable(true)
 	DermaPanel:MakePopup() 
 
 	DermaPanel.Paint = function(self, w, h)
@@ -72,19 +72,13 @@ concommand.Add( "gmedal_edit", function()
             for _,n in player.Iterator() do
                 if n:Name() == target then
                     if type == "Give Medal" then
-                        net.Start("UpdateMedals")
-                            net.WriteInt(gMedals.Config[k].id, 8)
-                            net.WritePlayer(n)
-                        net.SendToServer()
+                        -- network it!
                         n:GiveMedal(gMedals.Config[k].id)
                         notification.AddLegacy("You have given "..n:Name().." the "..gMedals.Config[k].name.." medal.", 0, 5)
                         print("[gMedal Logger] Giving "..n:Name().." (ENT ID: "..tostring(n).." ) "..gMedals.Config[k].name) 
                     elseif type == "Take Medal" then 
                         n:RemoveMedal(gMedals.Config[k].id)
-                        net.Start("UpdateMedalsRemove")
-                            net.WriteInt(gMedals.Config[k].id, 8)
-                            net.WritePlayer(n)
-                        net.SendToServer()
+                        -- network it!
                         notification.AddLegacy("You have removed ".." the "..gMedals.Config[k].name.." medal from "..n:Name(), 1, 5)
                         print("[gMedal Logger] Removing "..gMedals.Config[k].name.." from "..n:Name().." (ENT ID: "..tostring(n).." ) ") 
                     end
