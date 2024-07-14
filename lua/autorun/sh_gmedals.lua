@@ -96,7 +96,7 @@ if SERVER then -- no real reason to really have this *probably*
 
     hook.Add("PlayerInitialSpawn", "SYNC_MEDALS_ONSPAWN", function(ply)
         for enum,v in pairs(gMedals.Config) do
-            if ply:GetPData(enumk, false) then
+            if ply:GetPData(enum, false) then
                 ply:SetNWBool(enum, true)
             end
         end
