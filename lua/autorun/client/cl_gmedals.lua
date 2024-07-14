@@ -3,31 +3,6 @@ surface.CreateFont( "medalFont", {
 	size = 25,
 } )
 
-net.Receive("UpdateMedals", function()
-    local ply = net.ReadPlayer()
-    local medal = net.ReadInt(8)
-    ply:GiveMedal(medal)
-end)
-
-net.Receive("RemoveMedals", function()
-    local ply = net.ReadPlayer()
-    local medal = net.ReadInt(8)
-    ply:RemoveMedal(medal)
-end)
-
-net.Receive("SendMedals", function()
-    local ply = net.ReadPlayer()
-    local medal = net.ReadInt(8)
-    ply:GiveMedal(medal)
-    print("Broadcast received")
-end)
-
-net.Receive("SendMedalsRemove", function()
-    local ply = net.ReadPlayer()
-    local medal = net.ReadInt(8)
-    ply:RemoveMedal(medal)
-end)
-
 hook.Add("PostPlayerDraw", "gMedal_DrawMedal", function(ply)
     if (ply:GetPos():Distance(EyePos()) > 512) then return end
 
